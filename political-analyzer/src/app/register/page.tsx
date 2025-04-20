@@ -5,14 +5,13 @@ import type React from "react"
 import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { useAuth } from "@/context/auth-context"
-
+import { useAuth } from "@/contexts/auth-context"
+import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
-import { toast } from "sonner"
 
 export default function RegisterPage() {
   const [name, setName] = useState("")
@@ -26,7 +25,7 @@ export default function RegisterPage() {
     e.preventDefault()
 
     if (password !== confirmPassword) {
-      toast("Error", {
+      toast("Error",{
         description: "Passwords do not match",
       })
       return
@@ -35,12 +34,12 @@ export default function RegisterPage() {
     const success = await register(name, email, password)
 
     if (success) {
-      toast("Account created",{
+      toast("Account created", {
         description: "Your account has been created successfully",
       })
       router.push("/login")
     } else {
-      toast("Error",{
+      toast("Error", {
         description: "Failed to create account",
       })
     }
