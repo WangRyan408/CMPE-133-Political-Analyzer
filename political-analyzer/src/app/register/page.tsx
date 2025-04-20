@@ -22,28 +22,28 @@ export default function RegisterPage() {
   const router = useRouter()
 
   const handleRegister = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
     if (password !== confirmPassword) {
-      toast("Error",{
+      toast("Error", {
         description: "Passwords do not match",
-      })
-      return
+      });
+      return;
     }
 
-    const success = await register(name, email, password)
+    const success = await register(name, email, password);
 
     if (success) {
       toast("Account created", {
         description: "Your account has been created successfully",
-      })
-      router.push("/login")
+      });
+      router.push("/login");
     } else {
       toast("Error", {
         description: "Failed to create account",
-      })
+      });
     }
-  }
+  };
 
   return (
     <div className="container flex items-center justify-center min-h-[calc(100vh-8rem)] py-8">

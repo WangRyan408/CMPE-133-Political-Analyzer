@@ -45,58 +45,39 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const login = async (email: string, password: string) => {
-    setIsLoading(true)
-
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-
-    // For demo purposes, admin@example.com with any password logs in as admin
-    if (email === "admin@example.com") {
-      const adminUser = {
-        id: "1",
-        name: "Admin User",
-        email: "admin@example.com",
-        role: "admin" as const,
+    try {
+      const response = await fetch("http://127.0.0.1:8000/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username: email, password }),
+      })
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.detail)
       }
-      setUser(adminUser)
-      localStorage.setItem("user", JSON.stringify(adminUser))
-      setIsLoading(false)
       return true
+    } catch (error) {
+      console.error("Login failed:", error)
+      return false
     }
-    // Any other email logs in as regular user
-    else if (email) {
-      const regularUser = {
-        id: "2",
-        name: "Regular User",
-        email: email,
-        role: "user" as const,
-      }
-      setUser(regularUser)
-      localStorage.setItem("user", JSON.stringify(regularUser))
-      setIsLoading(false)
-      return true
-    }
-
-    setIsLoading(false)
-    return false
   }
 
   const register = async (name: string, email: string, password: string) => {
-    setIsLoading(true)
-
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-
-    const newUser = {
-      id: "3",
-      name: name,
-      email: email,
-      role: "user" as const,
+    try {
+      const response = await fetch("http://127.0.0.1:8000/api/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username: name, email, password }),
+      })
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.detail)
+      }
+      return true
+    } catch (error) {
+      console.error("Registration failed:", error)
+      return false
     }
-
-    // Don't auto-login after registration
-    setIsLoading(false)
-    return true
   }
 
   const logout = () => {
