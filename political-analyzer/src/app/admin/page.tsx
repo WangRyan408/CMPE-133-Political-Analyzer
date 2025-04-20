@@ -1,13 +1,13 @@
 "use client"
 
 import { useState } from "react"
-import { BarChart, LineChart } from "lucide-react"
+import { BarChart, LineChart, PieChart } from "lucide-react"
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Label } from "@/components/ui/label"
-import { AdminRouteGuard } from "@/components/admin-route-guard"
+import { AdminRouteGuard } from "@/app/components/admin-route-guard"
 
 export default function AdminPage() {
   const [timeRange, setTimeRange] = useState("30")
@@ -134,6 +134,7 @@ export default function AdminPage() {
         <Tabs defaultValue="political-leaning">
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="political-leaning">
+              <PieChart className="h-4 w-4 mr-2" />
               Political Leaning
             </TabsTrigger>
             <TabsTrigger value="user-activity">

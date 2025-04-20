@@ -1,18 +1,17 @@
 import type React from "react"
-import { ThemeProvider } from "@/components/theme-provider"
+import { ThemeProvider } from "@/app/components/theme-provider"
 import { Toaster } from "@/components/ui/sonner"
-import { MainNav } from "@/components/main-nav"
-import { UserNav } from "@/components/user-nav"
+import { MainNav } from "@/app/components/main-nav"
+import { UserNav } from "@/app/components/user-nav"
 import { cn } from "@/lib/utils"
 import { Inter } from "next/font/google"
 import "./globals.css"
-import { AuthProvider } from "@/contexts/auth-context"
+import { AuthProvider } from "@/context/auth-context"
 
-const inter = Inter({
-  subsets: ["latin"],
+const inter = Inter({ subsets: ["latin"],
+  variable: "--font-sans",
   display: "swap",
-  variable: "--font-inter",
-})
+ })
 
 export default function RootLayout({
   children,
@@ -20,13 +19,13 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" suppressHydrationWarning className={inter.variable}>
+    <html lang="en" suppressHydrationWarning>
       <head>
         <title>Political Analyzer</title>
         <meta name="description" content="Analyze the political leaning of news articles" />
       </head>
-      <body className={cn("min-h-screen bg-background font-sans antialiased")}>
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+      <body className={cn("min-h-screen bg-background font-sans antialiased", inter.variable)}>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           <AuthProvider>
             <div className="flex min-h-screen flex-col">
               <header className="sticky top-0 z-50 w-full border-b bg-background">
@@ -53,4 +52,3 @@ export default function RootLayout({
     </html>
   )
 }
-
