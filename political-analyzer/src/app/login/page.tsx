@@ -18,22 +18,23 @@ export default function LoginPage() {
   const { login, isLoading } = useAuth()
   const router = useRouter()
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
 
-    const success = await login(email, password);
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    const success = await login(email, password)
 
     if (success) {
-      toast("Success", {
+      toast("Success",{
         description: "You have been logged in successfully",
-      });
-      router.push("/");
+      })
+      router.push("/")
     } else {
       toast("Error", {
         description: "Invalid email or password",
-      });
+      })
     }
-  };
+  }
 
   return (
     <div className="container flex items-center justify-center min-h-[calc(100vh-8rem)] py-8">
