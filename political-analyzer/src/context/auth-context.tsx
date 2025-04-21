@@ -1,6 +1,7 @@
 "use client"
 
 import { createContext, useContext, useState, useEffect, type ReactNode, useCallback } from "react"
+import { login as apiLogin } from "../services/api";
 
 type User = {
   id: string
@@ -44,46 +45,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const login = async (email: string, password: string) => {
-    setIsLoading(true)
+    setIsLoading(true);
 
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-
-      // For demo purposes, admin@example.com with any password logs in as admin
-      if (email === "admin@example.com" && password === '1234') {
-        const adminUser = {
-          id: "1",
-          name: "Admin User",
-          email: "admin@example.com",
-          password: "1234",
-          role: "admin" as const,
-        }
-        setUser(adminUser)
-        localStorage.setItem("user", JSON.stringify(adminUser))
-        return true
-      }
-      // Any other email logs in as regular user
-      else if (email) {
-        const regularUser = {
-          id: "2",
-          name: "Regular User",
-          email: email,
-          role: "user" as const,
-        }
-        setUser(regularUser)
-        localStorage.setItem("user", JSON.stringify(regularUser))
-        return true
-      }
-
-      return false
+      const userData = await apiLogin(email, password);
+      setUser(userData);
+      localStorage.setItem("user", JSON.stringify(userData));
+      return true;
     } catch (error) {
-      console.error("Login error:", error)
-      return false
+      if (error instanceof Error) {
+        console.error("Login error:", error.message);
+      } else {
+        console.error("Login error:", error);
+      }
+      return false;
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const register = async (name: string, email: string, password: string) => {
     setIsLoading(true)
