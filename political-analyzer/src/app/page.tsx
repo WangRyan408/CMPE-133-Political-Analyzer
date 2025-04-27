@@ -3,22 +3,23 @@
 import { useState } from "react"
 import { BookmarkPlus, ExternalLink } from "lucide-react"
 import { toast } from "sonner"
+
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { ArticleAnalysis } from "@/app/components/article-analysis"
+import { ArticleAnalysis } from "@/components/article-analysis"
 
 export default function Home() {
   const [url, setUrl] = useState("")
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [showResults, setShowResults] = useState(false)
-
+  
 
   const handleAnalyze = () => {
     if (!url) {
-      toast("Error", {
+      toast.error("Error", {
         description: "Please enter a URL to analyze",
       })
       return

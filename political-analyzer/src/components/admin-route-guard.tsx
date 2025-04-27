@@ -4,13 +4,12 @@ import type React from "react"
 
 import { useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { useAuth } from "@/context/auth-context"
+import { useAuth } from "@/contexts/auth-context"
 import { toast } from "sonner"
 
 export function AdminRouteGuard({ children }: { children: React.ReactNode }) {
   const { user, isLoading, isAdmin } = useAuth()
   const router = useRouter()
-
 
   useEffect(() => {
     if (!isLoading && !isAdmin()) {
