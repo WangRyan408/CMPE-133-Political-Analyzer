@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, Column, Integer, String
+from sqlalchemy import create_engine, Column, Integer, String, and_  # Add this import
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session
 from pydantic import BaseModel
@@ -19,6 +19,7 @@ class User(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, index=True)
     email = Column(String, unique=True, index=True)
+    password = Column(String, index=True)  
     
 
 Base.metadata.create_all(bind=engine)
@@ -46,7 +47,7 @@ class UserResponse(BaseModel):
     class Config:
         orm_mode = True  # This allows Pydantic to work with SQLAlchemy models
 
-@app.post("/users/", response_model=UserResponse)
+@app.post("/users/register", response_model=UserResponse)
 def create_user(user: UserCreate, db: Session = Depends(get_db)):
     db_user = User(name=user.name, email=user.email, password=user.password)  # Assuming you want to store the password
     db.add(db_user)
@@ -54,15 +55,15 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
     db.refresh(db_user)
     return db_user
 
-@app.get("/users/", response_model=List[UserResponse])
+@app.get("/users/listofusers", response_model=List[UserResponse])
 def read_users(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
     users = db.query(User).offset(skip).limit(limit).all()
     return users
 
 
-@app.get("/users/{user_id}", response_model=UserResponse)
-def read_user(user_id: int, db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.id == user_id).first()
+@app.get("/users/login", response_model=UserResponse)
+def read_user(user_email: str, user_password: str, db: Session = Depends(get_db)):
+    user = db.query(User).filter(and_(User.email == user_email, User.password == user_password)).first()
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
     return user
@@ -70,14 +71,39 @@ def read_user(user_id: int, db: Session = Depends(get_db)):
 class UserUpdate(BaseModel):
     name: Optional[str] = None
     email: Optional[str] = None
+    password: Optional[str] = None  # Assuming you want to update the password
 
-@app.put("/users/{user_id}", response_model=UserResponse)
-def update_user(user_id: int, user: UserUpdate, db: Session = Depends(get_db)):
-    db_user = db.query(User).filter(User.id == user_id).first()
+@app.put("/users/update/name", response_model=UserResponse)
+def update_user(user_name: int, user: UserUpdate, db: Session = Depends(get_db)):
+    db_user = db.query(User).filter(User.name == user_name).first()
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")
     db_user.name = user.name if user.name is not None else db_user.name
+    # db_user.email = user.email if user.email is not None else db_user.email
+    # db_user.password = user.password if user.password is not None else db_user.password  # Assuming you want to update the password
+    db.commit()
+    db.refresh(db_user)
+    return db_user
+
+@app.put("/users/update/email", response_model=UserResponse)
+def update_user(user_email: int, user: UserUpdate, db: Session = Depends(get_db)):
+    db_user = db.query(User).filter(User.email == user_email).first()
+    if db_user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    # db_user.name = user.name if user.name is not None else db_user.name
     db_user.email = user.email if user.email is not None else db_user.email
+    # db_user.password = user.password if user.password is not None else db_user.password  # Assuming you want to update the password
+    db.commit()
+    db.refresh(db_user)
+    return db_user
+
+@app.put("/users/update/password", response_model=UserResponse)
+def update_user(user_password: int, user: UserUpdate, db: Session = Depends(get_db)):
+    db_user = db.query(User).filter(User.password == user_password).first()
+    if db_user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    # db_user.name = user.name if user.name is not None else db_user.name
+    # db_user.email = user.email if user.email is not None else db_user.email
     db_user.password = user.password if user.password is not None else db_user.password  # Assuming you want to update the password
     db.commit()
     db.refresh(db_user)
