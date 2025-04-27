@@ -19,6 +19,7 @@ class User(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, index=True)
     email = Column(String, unique=True, index=True)
+    
 
 Base.metadata.create_all(bind=engine)
 
@@ -33,19 +34,21 @@ def get_db():
 class UserCreate(BaseModel):
     name: str
     email: str
+    password: str  # Assuming you want to add a password field
 
 # Add a Pydantic model for the response
 class UserResponse(BaseModel):
     id: int
     name: str
     email: str
+    password: str  # Assuming you want to include the password in the response
 
     class Config:
         orm_mode = True  # This allows Pydantic to work with SQLAlchemy models
 
 @app.post("/users/", response_model=UserResponse)
 def create_user(user: UserCreate, db: Session = Depends(get_db)):
-    db_user = User(name=user.name, email=user.email)
+    db_user = User(name=user.name, email=user.email, password=user.password)  # Assuming you want to store the password
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
@@ -55,7 +58,6 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
 def read_users(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
     users = db.query(User).offset(skip).limit(limit).all()
     return users
-
 
 
 @app.get("/users/{user_id}", response_model=UserResponse)
@@ -76,6 +78,7 @@ def update_user(user_id: int, user: UserUpdate, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="User not found")
     db_user.name = user.name if user.name is not None else db_user.name
     db_user.email = user.email if user.email is not None else db_user.email
+    db_user.password = user.password if user.password is not None else db_user.password  # Assuming you want to update the password
     db.commit()
     db.refresh(db_user)
     return db_user
