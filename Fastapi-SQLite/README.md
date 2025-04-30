@@ -1,5 +1,10 @@
 # Backend Instructions
 
+## Pre-requisites
+- Make (Standard on Unix OSes)
+- Python 3
+
+
 ## Quickstart
 1. Install Dependencies.
 ```
@@ -20,4 +25,4 @@ make dev
 
 <br>
 
-Port number is 8000, so the full baseURL will be `http://localhost:8000
+Port number is 8000, so the full baseURL will be http://localhost:8000
