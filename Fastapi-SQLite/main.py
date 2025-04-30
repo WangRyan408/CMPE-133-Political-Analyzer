@@ -68,13 +68,17 @@ def read_user(user_email: str, user_password: str, db: Session = Depends(get_db)
         raise HTTPException(status_code=404, detail="User not found")
     return user
 
-class UserUpdate(BaseModel):
+class UserUpdateName(BaseModel):
     name: Optional[str] = None
-    email: Optional[str] = None
-    password: Optional[str] = None  # Assuming you want to update the password
+
+class UserUpdateEmail(BaseModel):
+    email: Optional[str] = None 
+
+class UserUpdatePassword(BaseModel):
+    password: Optional[str] = None  
 
 @app.put("/users/update/name", response_model=UserResponse)
-def update_user(user_name: int, user: UserUpdate, db: Session = Depends(get_db)):
+def update_user(user_name: str, user: UserUpdateName, db: Session = Depends(get_db)):
     db_user = db.query(User).filter(User.name == user_name).first()
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")
@@ -86,7 +90,7 @@ def update_user(user_name: int, user: UserUpdate, db: Session = Depends(get_db))
     return db_user
 
 @app.put("/users/update/email", response_model=UserResponse)
-def update_user(user_email: int, user: UserUpdate, db: Session = Depends(get_db)):
+def update_user(user_email: str, user: UserUpdateEmail, db: Session = Depends(get_db)):
     db_user = db.query(User).filter(User.email == user_email).first()
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")
@@ -98,7 +102,7 @@ def update_user(user_email: int, user: UserUpdate, db: Session = Depends(get_db)
     return db_user
 
 @app.put("/users/update/password", response_model=UserResponse)
-def update_user(user_password: int, user: UserUpdate, db: Session = Depends(get_db)):
+def update_user(user_password: int, user: UserUpdatePassword, db: Session = Depends(get_db)):
     db_user = db.query(User).filter(User.password == user_password).first()
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")
