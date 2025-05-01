@@ -27,7 +27,7 @@ class UserCreate(BaseModel):
 class UserResponse(BaseModel):
     id: int
     name: str
-    email: str
+    email: str 
 
     class Config:
         orm_mode = True
@@ -76,3 +76,11 @@ def delete_user(user_id: int, db: Session = Depends(get_db)):
     db.delete(db_user)
     db.commit()
     return db_user
+
+@account_router.get("/view", response_model=List[UserResponse])
+def view_accounts(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
+    """
+    Endpoint to view all accounts in the database with optional pagination.
+    """
+    users = db.query(User).offset(skip).limit(limit).all()
+    return users
