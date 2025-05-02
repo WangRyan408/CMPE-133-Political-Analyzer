@@ -70,6 +70,14 @@ export default function Home() {
       console.log(responseData);
       setAnalysisData(responseData);
 
+      if (analysisData.title == "")
+      {
+        toast.error("Error", {
+          description: "Invalid URL",
+        })
+        setIsAnalyzing(false);
+        return
+      }
       
       setShowResults(true);
       setIsAnalyzing(false);

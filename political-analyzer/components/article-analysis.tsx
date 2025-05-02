@@ -23,11 +23,11 @@ interface ArticleAnalysisProps {
 export function ArticleAnalysis({ data }: ArticleAnalysisProps) {
   // Convert prediction (0-1) to political leaning category
   const getPoliticalLeaning = (prediction: number) => {
-    if (prediction <= 0.2) return "Far Left";
-    if (prediction <= 0.4) return "Left";
+    if (prediction <= 0.2) return "Far Right";
+    if (prediction <= 0.4) return "Right";
     if (prediction <= 0.6) return "Moderate";
-    if (prediction <= 0.8) return "Right";
-    return "Far Right";
+    if (prediction <= 0.8) return "Left";
+    return "Far Left";
   }
   
   // Calculate position for the indicator (0-100%)
@@ -39,8 +39,8 @@ export function ArticleAnalysis({ data }: ArticleAnalysisProps) {
   // Calculate percentage leaning (with center at 0%)
   const getLeaningPercentage = (prediction: number) => {
     // 0.5 is center (0%)
-    // 0 is far left (100% left)
-    // 1 is far right (100% right)
+    // 1 is far left (100% left)
+    // 0 is far right (100% right)
     if (prediction === 0.5) return "0%";
     
     if (prediction > 0.5) {
