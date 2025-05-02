@@ -1,8 +1,9 @@
 "use client"
 
-import { useAuth } from "@/context/auth-context"
+import { useAuth } from "@/contexts/auth-context"
 import Link from "next/link"
 import { LogIn, LogOut, User, Bookmark } from "lucide-react"
+
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -13,16 +14,24 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { ThemeToggle } from "@/app/components/theme-toggle"
+import { ThemeToggle } from "@/components/theme-toggle"
+import { Skeleton } from "@/components/ui/skeleton"
 
 export function UserNav() {
-  const { user, logout } = useAuth()
+  const { user, logout, isLoading } = useAuth()
   const isLoggedIn = !!user
 
   return (
     <div className="flex items-center gap-2">
       <ThemeToggle />
-      {isLoggedIn ? (
+
+      {isLoading ? (
+        // Show skeleton loader while checking auth state
+        <div className="flex items-center gap-2">
+          <Skeleton className="h-9 w-20" />
+          <Skeleton className="h-9 w-20" />
+        </div>
+      ) : isLoggedIn ? (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="relative h-8 w-8 rounded-full">
