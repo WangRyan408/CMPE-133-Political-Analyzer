@@ -5,7 +5,7 @@ from typing import List
 from pydantic import BaseModel
 import os
 from dotenv import load_dotenv
-from .database import get_db
+from models.database import get_db
 from .models import User
 
 load_dotenv()
