@@ -8,7 +8,11 @@ import { Inter } from "next/font/google"
 import "./globals.css"
 import { AuthProvider } from "@/contexts/auth-context"
 
-const inter = Inter({ subsets: ["latin"] })
+const inter = Inter({ 
+  subsets: ["latin"],
+  display: 'swap',
+  variable: '--font-inter' 
+})
 
 export default function RootLayout({
   children,
@@ -16,7 +20,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning className={inter.variable}>
       <head>
         <title>Political Analyzer</title>
         <meta name="description" content="Analyze the political leaning of news articles" />

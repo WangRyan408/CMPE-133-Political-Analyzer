@@ -2,7 +2,6 @@
 
 import { useState } from "react"
 import { BookmarkPlus, ExternalLink } from "lucide-react"
-import { useToast } from "@/hooks/use-toast"
 import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
@@ -16,7 +15,6 @@ export default function Home() {
   const [url, setUrl] = useState("")
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [showResults, setShowResults] = useState(false)
-  const { toast: showToast } = useToast()
 
   const handleAnalyze = () => {
     if (!url) {
