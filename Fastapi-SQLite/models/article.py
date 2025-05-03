@@ -62,8 +62,20 @@ def create_article(article: ArticleCreate, db: Session = Depends(get_db)):
     return db_article
 
 @article_router.get("/", response_model=List[ArticleResponse])
-def get_articles(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
-    articles = db.query(Article).offset(skip).limit(limit).all()
+def get_articles(
+    skip: int = 0,
+    limit: int = 10,
+    user_id: int | None = None,  # Optional filter by user_id
+    db: Session = Depends(get_db)
+):
+    query = db.query(Article)
+    
+    # Apply user_id filter if provided
+    if user_id is not None:
+        query = query.filter(Article.user_id == user_id)
+    
+    # Apply pagination
+    articles = query.offset(skip).limit(limit).all()
     return articles
 
 @article_router.delete("/{article_id}", response_model=ArticleResponse)
