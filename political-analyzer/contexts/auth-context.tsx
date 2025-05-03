@@ -33,7 +33,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       try {
         const storedUser = localStorage.getItem("user")
         if (storedUser) {
-          setUser(JSON.parse(storedUser))
+          setUser(JSON.parse(storedUser));
         }
       } catch (error) {
         console.error("Error checking authentication:", error)
@@ -51,8 +51,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     // Simulate API call
     try {
-      const response = await axios.get(`/api/login?email=${email}&password=${password}`);
+      const response = await axios.get(`/api/login?user_email=${email}&user_password=${password}`);
       const responseData = response.data;
+      
+      if (!responseData || !responseData.id) {
+        console.error("Login failed: Invalid response data", responseData);
+        setIsLoading(false);
+        return false;
+      }
 
       const userData = {
         id: responseData.id,
@@ -63,6 +69,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Change later
       setUser(userData);
 
+      console.log(userData);
       localStorage.setItem("user", JSON.stringify(userData));
       setIsLoading(false);
       return true;
