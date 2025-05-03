@@ -13,12 +13,15 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 
 export default function RegisterPage() {
-  const [name, setName] = useState("")
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [secretKey, setSecretKey] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("")
+  const [role, setRole] = useState("user")
   const { register, isLoading } = useAuth()
   const router = useRouter()
   const { toast } = useToast()
@@ -35,7 +38,9 @@ export default function RegisterPage() {
       return
     }
 
-    const success = await register(name, email, password)
+    // Only pass secretKey if admin role is selected
+    const keyToPass = role === "admin" ? secretKey : "";
+    const success = await register(name, email, password, keyToPass);
 
     if (success) {
       toast({
@@ -61,6 +66,33 @@ export default function RegisterPage() {
         </CardHeader>
         <form onSubmit={handleRegister}>
           <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label>Account Type</Label>
+              <RadioGroup 
+                value={role} 
+                onValueChange={setRole} 
+                className="flex gap-4"
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="user" id="user" />
+                  <Label htmlFor="user">User</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="admin" id="admin" />
+                  <Label htmlFor="admin">Admin</Label>
+                </div>
+              </RadioGroup>
+            </div>
+            
+            {role === "admin" && (
+              <div className="space-y-2">
+                <Label htmlFor="secretKey">Secret Key</Label>
+                <Input id="secret" 
+                placeholder="009df691417038e125ac24cbb9b22f8fa7d762da99c4e293dbf2dfdd59fac009" 
+                value={secretKey} onChange={(e) => setSecretKey(e.target.value)}/>
+              </div>
+            )}
+            
             <div className="space-y-2">
               <Label htmlFor="name">Name</Label>
               <Input id="name" placeholder="John Doe" value={name} onChange={(e) => setName(e.target.value)} required />
