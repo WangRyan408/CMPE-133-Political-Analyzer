@@ -12,9 +12,17 @@ import { AuthRouteGuard } from "@/components/auth-route-guard"
 import { getPoliticalLeaningColor } from "@/lib/utils"
 import axios from 'axios';
 
+type User = {
+  id: string
+  name: string
+  email: string
+  role: boolean
+}
+
 export default function SavedArticlesPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [user, setUser] = useState<User | null>(null);
   const articlesPerPage = 10;
   const maxArticles = 25;
 
@@ -48,20 +56,40 @@ export default function SavedArticlesPage() {
 
 
   const getArticles = async () => {
-    const response = await axios.get(`/api/saved/?skip=0&limit=${maxArticles}`);
-    const data = response.data;
-    console.log(data);
-    setSavedArticles(prevArticles => [...prevArticles, ...data]);
+    try {
+      const storedUser = localStorage.getItem("user");
+      if (storedUser) {
+        const parsedUser = JSON.parse(storedUser);
+        setUser(parsedUser);
+        
+        const response = await axios.get(`/api/saved/?skip=0&limit=${maxArticles}&user_id=${parsedUser.id}`);
+        const data = response.data;
+        console.log(data);
+        setSavedArticles(prevArticles => [...prevArticles, ...data]);
+      }
+    } catch (error) {
+      console.error("Error checking authentication:", error);
+      toast("Error loading articles", {
+        description: "User ID not found",
+      })
+    }
   }
 
 
 
-  const handleDelete = (id: number) => {
-
-    setSavedArticles(savedArticles.filter((article) => article.id !== id))
-    toast.success("Article removed", {
-      description: "The article has been removed from your saved list",
-    })
+  const handleDelete = async (id: number) => {
+    try {
+      await axios.delete(`/api/saved?id=${id}`);
+      setSavedArticles(prevArticles => prevArticles.filter(article => article.id !== id));
+      
+      toast.success("Article removed", {
+        description: "The article has been removed from your saved list",
+      });
+    } catch (error) {
+      toast.error("Failed to remove article", {
+        description: "Please try again later",
+      });
+    }
   }
 
   useEffect(() => {
