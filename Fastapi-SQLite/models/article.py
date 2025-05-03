@@ -14,18 +14,30 @@ class Article(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String, index=True)
+    source = Column(String, index=True)
+    url = Column(String, index=True)
+    date = Column(String, index=True)
+    leaning = Column(String, index=True)
     content = Column(String)
     user_id = Column(Integer, index=True)
 
 # Pydantic Models
 class ArticleCreate(BaseModel):
     title: str
+    source: str
+    url: str
+    date: str
+    leaning: str
     content: str
     user_id: int
 
 class ArticleResponse(BaseModel):
     id: int
     title: str
+    source: str
+    url: str
+    date: str
+    leaning: str
     content: str
     user_id: int
 
@@ -35,7 +47,15 @@ class ArticleResponse(BaseModel):
 # Endpoints
 @article_router.post("/create", response_model=ArticleResponse)
 def create_article(article: ArticleCreate, db: Session = Depends(get_db)):
-    db_article = Article(title=article.title, content=article.content, user_id=article.user_id)
+    db_article = Article(
+        title=article.title,
+        source=article.source,
+        url=article.url, 
+        date=article.date,
+        leaning=article.leaning,  # Fixed typo from 'learning' to 'leaning'
+        content=article.content,
+        user_id=article.user_id
+    )
     db.add(db_article)
     db.commit()
     db.refresh(db_article)
@@ -47,7 +67,7 @@ def get_articles(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
     return articles
 
 @article_router.delete("/{article_id}", response_model=ArticleResponse)
-def delete_user(article_id: int, db: Session = Depends(get_db)):
+def delete_article(article_id: int, db: Session = Depends(get_db)):  # Renamed from delete_user to delete_article
     article = db.query(Article).filter(Article.id == article_id).first()
     if not article:
         raise HTTPException(status_code=404, detail="Article not found")
