@@ -15,6 +15,9 @@ import { Switch } from "@/components/ui/switch"
 import { AlertCircle, Download, Trash2 } from "lucide-react"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { AuthRouteGuard } from "@/components/auth-route-guard"
+import axios from 'axios';
+import { useAuth } from "@/contexts/auth-context"
+
 
 export default function AccountPage() {
   const [name, setName] = useState("John Doe")
@@ -24,21 +27,46 @@ export default function AccountPage() {
   const [confirmPassword, setConfirmPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
 
-  const handleUpdateProfile = (e: React.FormEvent) => {
+  const { user, updateUser } = useAuth();
+
+
+  const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
 
-    // Simulate update
-    setTimeout(() => {
-      setIsLoading(false)
+    const userInfo = {
+      name: name,
+      email: email,
+      password: "",
+    }
+
+    try {
+      const response = await axios.put(`/api/updateUser/?user_id=${user?.id}`, userInfo);
+      
+      updateUser({ name, email });
+      console.log(response.data);
       toast.success("Profile updated", {
         description: "Your profile has been updated successfully",
-      })
-    }, 1500)
+      });
+
+    } catch (error) {
+      console.error("Update failed:", error);
+      toast.error("Update failed", {
+        description: "There was a problem updating your profile",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   }
 
-  const handleUpdatePassword = (e: React.FormEvent) => {
+  const handleUpdatePassword = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    const newPass = {
+      name: "",
+      email: "",
+      password: newPassword,
+    }
 
     if (newPassword !== confirmPassword) {
       toast.error("Error", {
@@ -49,18 +77,28 @@ export default function AccountPage() {
 
     setIsLoading(true)
 
-    // Simulate update
-    setTimeout(() => {
-      setIsLoading(false)
-      setCurrentPassword("")
-      setNewPassword("")
-      setConfirmPassword("")
+    try {
+      const response = await axios.put(`/api/updateUser/?user_id=${user?.id}`, newPass);
+      console.log(response.data);
+
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
       toast.success("Password updated", {
         description: "Your password has been updated successfully",
-      })
-    }, 1500)
+      });
+    } catch (error) {
+      console.error("Password Update Failed:", error);
+      toast.error("Password update failed", {
+        description: "There was a problem updating your password",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+
   }
 
+  //TODO: Allow user to download db data into CSV
   const handleDownloadData = () => {
     toast.success("Data export initiated", {
       description: "Your data will be emailed to you shortly",

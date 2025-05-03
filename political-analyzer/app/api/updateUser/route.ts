@@ -1,16 +1,34 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-export async function PUT(request: NextRequest) {
-  const { searchParams } = new URL(request.url);
-  const skip = searchParams.get('skip');
-  const limit = searchParams.get('limit');
-  const userId = searchParams.get('user_id');
 
-  try {
-    const response = await fetch(`http://localhost:8000/users/update/user_id=${userId}`);
-    const data = await response.json();
-    return NextResponse.json(data);
-  } catch (error) {
-    return NextResponse.json({ error: "Login failed" }, { status: 500 });
+export async function PUT(request: NextRequest) {
+    const { searchParams } = new URL(request.url);
+    const userId = searchParams.get('user_id');
+    
+    if (!userId) {
+      return NextResponse.json({ error: "User ID is required" }, { status: 400 });
+    }
+    
+    try {
+      // Get request body data
+      const requestData = await request.json();
+      
+      const response = await fetch(`http://localhost:8000/users/update?user_id=${userId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(requestData)
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Request failed with status ${response.status}`);
+      }
+      
+      const data = await response.json();
+      return NextResponse.json(data);
+    } catch (error) {
+      console.error("Update failed:", error);
+      return NextResponse.json({ error: "Update failed" }, { status: 500 });
+    }
   }
-}
