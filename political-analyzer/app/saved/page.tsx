@@ -19,6 +19,17 @@ type User = {
   role: boolean
 }
 
+type Article = {
+  id: number,
+  title: string,
+  source: string,
+  url: string,
+  date: string,
+  // leaning: "Far-Left" | "Left" | "Moderate" | "Right" | "Far-Right"
+  leaning: string
+}
+
+
 export default function SavedArticlesPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -27,7 +38,7 @@ export default function SavedArticlesPage() {
   const maxArticles = 25;
 
   // Mock data for saved articles
-  const [savedArticles, setSavedArticles] = useState([
+  const [savedArticles, setSavedArticles] = useState<Article[]>([
     {
       id: 1,
       title: "The Impact of New Tax Legislation",
