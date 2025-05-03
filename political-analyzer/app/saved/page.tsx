@@ -1,19 +1,22 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
-import { ExternalLink, Trash2 } from "lucide-react"
+import { ExternalLink, Trash2, ChevronLeft, ChevronRight } from "lucide-react"
 import { toast } from "sonner"
-
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { AuthRouteGuard } from "@/components/auth-route-guard"
 import { getPoliticalLeaningColor } from "@/lib/utils"
+import axios from 'axios';
 
 export default function SavedArticlesPage() {
-  const [searchTerm, setSearchTerm] = useState("")
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const articlesPerPage = 10;
+  const maxArticles = 25;
 
   // Mock data for saved articles
   const [savedArticles, setSavedArticles] = useState([
@@ -43,12 +46,28 @@ export default function SavedArticlesPage() {
     },
   ])
 
+
+  const getArticles = async () => {
+    const response = await axios.get(`/api/saved/?skip=0&limit=${maxArticles}`);
+    const data = response.data;
+    console.log(data);
+    setSavedArticles(prevArticles => [...prevArticles, ...data]);
+  }
+
+
+
   const handleDelete = (id: number) => {
+
     setSavedArticles(savedArticles.filter((article) => article.id !== id))
     toast.success("Article removed", {
       description: "The article has been removed from your saved list",
     })
   }
+
+  useEffect(() => {
+    getArticles();
+  }, []);
+
 
   // Filter articles based on search term
   const filteredArticles = savedArticles.filter(
@@ -56,6 +75,26 @@ export default function SavedArticlesPage() {
       article.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       article.source.toLowerCase().includes(searchTerm.toLowerCase()),
   )
+
+  const totalPages = Math.ceil(filteredArticles.length / articlesPerPage)
+  const indexOfLastArticle = currentPage * articlesPerPage
+  const indexOfFirstArticle = indexOfLastArticle - articlesPerPage
+  const currentArticles = filteredArticles.slice(indexOfFirstArticle, indexOfLastArticle)
+
+  // Handle page navigation
+  const goToNextPage = () => {
+    setCurrentPage((prevPage) => Math.min(prevPage + 1, totalPages))
+  }
+
+  const goToPreviousPage = () => {
+    setCurrentPage((prevPage) => Math.max(prevPage - 1, 1))
+  }
+
+  // Reset to first page when search changes
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value)
+    setCurrentPage(1)
+  }
 
   return (
     <AuthRouteGuard>
@@ -70,7 +109,7 @@ export default function SavedArticlesPage() {
             <Input
               placeholder="Search saved articles..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={handleSearch}
               className="max-w-md mx-auto"
             />
           </div>
@@ -83,48 +122,79 @@ export default function SavedArticlesPage() {
               </Button>
             </Card>
           ) : (
-            <div className="space-y-4">
-              {filteredArticles.map((article) => (
-                <Card key={article.id}>
-                  <CardHeader className="pb-2">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <CardTitle className="text-lg">{article.title}</CardTitle>
-                        <CardDescription>
-                          {article.source} • {article.date}
-                        </CardDescription>
+            <>
+              <div className="space-y-4">
+                {currentArticles.map((article) => (
+                  <Card key={article.id}>
+                    <CardHeader className="pb-2">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <CardTitle className="text-lg">{article.title}</CardTitle>
+                          <CardDescription>
+                            {article.source} • {article.date}
+                          </CardDescription>
+                        </div>
+                        <Badge className={getPoliticalLeaningColor(article.leaning)}>{article.leaning}</Badge>
                       </div>
-                      <Badge className={getPoliticalLeaningColor(article.leaning)}>{article.leaning}</Badge>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="pb-2">
-                    <div className="flex items-center space-x-2">
-                      <Button variant="outline" size="sm" asChild>
-                        <a href={article.url} target="_blank" rel="noopener noreferrer">
-                          <ExternalLink className="h-4 w-4 mr-2" />
-                          Visit Source
-                        </a>
+                    </CardHeader>
+                    <CardContent className="pb-2">
+                      <div className="flex items-center space-x-2">
+                        <Button variant="outline" size="sm" asChild>
+                          <a href={article.url} target="_blank" rel="noopener noreferrer">
+                            <ExternalLink className="h-4 w-4 mr-2" />
+                            Visit Source
+                          </a>
+                        </Button>
+                        <Button variant="outline" size="sm" asChild>
+                          <Link href={`/?url=${encodeURIComponent(article.url)}`}>Reanalyze</Link>
+                        </Button>
+                      </div>
+                    </CardContent>
+                    <CardFooter className="flex justify-between">
+                      <p className="text-sm text-muted-foreground">Saved on {article.date}</p>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-red-500 hover:text-red-700 hover:bg-red-100"
+                        onClick={() => handleDelete(article.id)}
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Remove
                       </Button>
-                      <Button variant="outline" size="sm" asChild>
-                        <Link href={`/?url=${encodeURIComponent(article.url)}`}>Reanalyze</Link>
-                      </Button>
-                    </div>
-                  </CardContent>
-                  <CardFooter className="flex justify-between">
-                    <p className="text-sm text-muted-foreground">Saved on {article.date}</p>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-red-500 hover:text-red-700 hover:bg-red-100"
-                      onClick={() => handleDelete(article.id)}
-                    >
-                      <Trash2 className="h-4 w-4 mr-2" />
-                      Remove
-                    </Button>
-                  </CardFooter>
-                </Card>
-              ))}
-            </div>
+                    </CardFooter>
+                  </Card>
+                ))}
+              </div>
+              
+              {/* Pagination controls */}
+              { (
+                <div className="flex justify-center items-center mt-6 space-x-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={goToPreviousPage} 
+                    disabled={currentPage === 1}
+                  >
+                    <ChevronLeft className="h-4 w-4 mr-1" />
+                    Previous
+                  </Button>
+                  
+                  <div className="text-sm mx-2">
+                    Page {currentPage} of {totalPages}
+                  </div>
+                  
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={goToNextPage} 
+                    disabled={currentPage === totalPages}
+                  >
+                    Next
+                    <ChevronRight className="h-4 w-4 ml-1" />
+                  </Button>
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>

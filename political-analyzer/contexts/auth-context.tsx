@@ -1,19 +1,21 @@
 "use client"
 
 import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
+import axios from "axios";
+
 
 type User = {
   id: string
   name: string
   email: string
-  role: "user" | "admin"
+  role: boolean
 }
 
 type AuthContextType = {
   user: User | null
   isLoading: boolean
   login: (email: string, password: string) => Promise<boolean>
-  register: (name: string, email: string, password: string) => Promise<boolean>
+  register: (name: string, email: string, password: string, secretKey: string) => Promise<boolean>
   logout: () => void
   isAdmin: () => boolean
 }
@@ -48,55 +50,58 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsLoading(true)
 
     // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+    try {
+      const response = await axios.get(`/api/login?email=${email}&password=${password}`);
+      const responseData = response.data;
 
-    // For demo purposes, admin@example.com with any password logs in as admin
-    if (email === "admin@example.com") {
-      const adminUser = {
-        id: "1",
-        name: "Admin User",
-        email: "admin@example.com",
-        role: "admin" as const,
-      }
-      setUser(adminUser)
-      localStorage.setItem("user", JSON.stringify(adminUser))
+      const userData = {
+        id: responseData.id,
+        name: responseData.name,
+        email: responseData.email,
+        role: responseData.isAdmin
+      };
+      // Change later
+      setUser(userData);
+
+      localStorage.setItem("user", JSON.stringify(userData));
+      setIsLoading(false);
+      return true;
+
+    } catch (error) {
+      console.error("Login failed:", error)
       setIsLoading(false)
-      return true
-    }
-    // Any other email logs in as regular user
-    else if (email) {
-      const regularUser = {
-        id: "2",
-        name: "Regular User",
-        email: email,
-        role: "user" as const,
-      }
-      setUser(regularUser)
-      localStorage.setItem("user", JSON.stringify(regularUser))
-      setIsLoading(false)
-      return true
+      return false
     }
 
-    setIsLoading(false)
-    return false
   }
 
-  const register = async (name: string, email: string, password: string) => {
-    setIsLoading(true)
+  const register = async (name: string, email: string, password: string, secretKey: string) => {
+    setIsLoading(true);
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-
-    const newUser = {
-      id: "3",
-      name: name,
-      email: email,
-      role: "user" as const,
+    try {
+      const response = await fetch("/api/register", {
+        method: 'POST',
+        headers: {
+          'accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          name: name,
+          email: email,
+          password: password,
+          secret_key: secretKey
+        })
+      });
+      
+      const responseData = await response.json();
+      console.log(responseData);
+      setIsLoading(false);
+      return true;
+    } catch (error) {
+      console.error("Registration failed:", error)
+      setIsLoading(false);
+      return false;
     }
-
-    // Don't auto-login after registration
-    setIsLoading(false)
-    return true
   }
 
   const logout = () => {
@@ -105,7 +110,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   const isAdmin = () => {
-    return user?.role === "admin"
+    return user?.role ?? false;
   }
 
   return (
