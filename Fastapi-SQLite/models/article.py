@@ -71,6 +71,11 @@ def analyze(request: ArticleRequest):
 
 @article_router.post("/create", response_model=ArticleResponse)
 def create_article(article: ArticleCreate, db: Session = Depends(get_db)):
+
+    existing_article = db.query(Article).filter(Article.url == article.url).first()
+    if existing_article:
+        raise HTTPException(status_code=404, detail=f"duplicate article")
+
     db_article = Article(
         title=article.title,
         user_id=article.user_id,

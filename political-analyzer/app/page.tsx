@@ -122,7 +122,6 @@ export default function Home() {
     toast.success("Article saved", {
       description: "The article has been saved to your account",
     })
-
   }
 
 
