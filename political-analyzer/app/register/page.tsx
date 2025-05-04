@@ -128,15 +128,6 @@ export default function RegisterPage() {
                 required
               />
             </div>
-            <div className="flex items-center space-x-2">
-              <Checkbox id="terms" required />
-              <Label htmlFor="terms" className="text-sm">
-                I agree to the{" "}
-                <Link href="/terms" className="text-primary underline-offset-4 hover:underline">
-                  terms and conditions
-                </Link>
-              </Label>
-            </div>
           </CardContent>
           <CardFooter className="flex flex-col space-y-4">
             <Button type="submit" className="w-full" disabled={isLoading}>
