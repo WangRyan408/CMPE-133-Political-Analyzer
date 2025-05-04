@@ -1,6 +1,6 @@
-import { Progress } from "@/components/ui/progress"
+//mport { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
-import { Card, CardContent } from "@/components/ui/card"
+// import { Card, CardContent } from "@/components/ui/card"
 import { 
   Tooltip,
   TooltipContent,
@@ -12,7 +12,8 @@ type Analysis = {
     prediction: number,
     authors: string,
     date: string
-    publisher: string
+    publisher: string,
+    title: string
   }
 
 interface ArticleAnalysisProps {
@@ -128,6 +129,11 @@ export function ArticleAnalysis({ data }: ArticleAnalysisProps) {
       <div className="space-y-2">
         <h3 className="text-lg font-medium">Source Information</h3>
         <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-1">
+            <p className="text-sm font-medium">Title</p>
+            <p className="text-sm text-muted-foreground">{data.title}</p>
+          </div>
+
           <div className="space-y-1">
             <p className="text-sm font-medium">Publication</p>
             <p className="text-sm text-muted-foreground">{data.publisher}</p>

@@ -13,12 +13,12 @@ export async function POST(request: NextRequest) {
         },
         body: JSON.stringify({
             title: data.title,
-            source: data.source,
-            url: data.url,
+            user_id: data.user_id,
+            prediction: data.prediction,
+            authors: data.authors,
             date: data.date,
-            leaning: data.leaning,
-            content: data.content,
-            user_id: data.id
+            publisher: data.publisher,
+            url: data.url
         })
       });
       
