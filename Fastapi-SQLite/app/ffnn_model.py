@@ -49,7 +49,7 @@ class NeuralNetworkModel():
         author_string = ""
 
         try:
-            full_text, authors, date, publisher = fetch_and_parse_article(url, check_url(url))
+            full_text, authors, date, publisher, title = fetch_and_parse_article(url, check_url(url))
         except ValueError as e:
             print(e)
 
@@ -75,7 +75,7 @@ class NeuralNetworkModel():
         print("\nDate:", date)
         print("Publisher:", publisher)
 
-        return float(y_pred), author_string, date, publisher, full_text
+        return float(y_pred), author_string, date, publisher, full_text, title
 
 # ---- Start of main ---- #
 
@@ -83,7 +83,7 @@ print(os.getcwd())
 
 # model = NeuralNetworkModel()
 # model.train()
-# model.test("https://www.cnn.com/2025/03/11/politics/department-of-education-cuts/index.html")
+# model.test("https://www.msnbc.com/opinion/msnbc-opinion/first-100-days-wall-street-trump-newsletter-rcna203413")
 
 # MSNBC https://www.msnbc.com/opinion/msnbc-opinion/first-100-days-wall-street-trump-newsletter-rcna203413
 # New York Post https://nypost.com/2025/04/29/lifestyle/why-just-checking-in-emails-are-a-bad-idea-experts-say/

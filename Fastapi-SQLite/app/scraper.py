@@ -18,11 +18,13 @@ def fetch_and_parse_article(url, hostname):
     article_content = None
     article_author = None
     article_date = None
+    article_title = None
 
     full_text = ""
     date = ""
     authors = []
     publisher = ""
+    title = ""
 
     # CNN attributes
     if hostname == "www.cnn.com":
@@ -39,6 +41,9 @@ def fetch_and_parse_article(url, hostname):
         article_date_og = soup.find(attrs=target_attrs_date)
         article_date_og = article_date_og.get_text().replace('\n', '').replace('\t', '').replace("Updated", "").strip()
         article_date = re.sub(r' {2,}', ' ', article_date_og)
+
+        target_attrs_title = {"class": "headline__text inline-placeholder vossi-headline-text"}
+        article_title = soup.find(attrs=target_attrs_title)
     
     # Fox News/Business attributes
     if hostname == "www.foxnews.com" or hostname == "www.foxbusiness.com":
@@ -58,6 +63,9 @@ def fetch_and_parse_article(url, hostname):
         article_date_og = article_date_og.get_text().replace('\n', '').replace('\t', '').replace("Updated", "").strip()
         article_date = re.sub(r' {2,}', ' ', article_date_og)
 
+        target_attrs_title = {"class": "headline speakable"}
+        article_title = soup.find(attrs=target_attrs_title)
+
     # BBC attributes
     if hostname == "www.bbc.com":
 
@@ -75,6 +83,9 @@ def fetch_and_parse_article(url, hostname):
         dt = datetime.strptime(article_date_og, "%Y-%m-%dT%H:%M:%S.%fZ")
         dt = dt.replace(tzinfo=timezone.utc)
         article_date = dt.strftime("%B %d, %Y %I:%M %p %Z")
+
+        target_attrs_title = {"class": "sc-737179d2-0 dAzQyd"}
+        article_title = soup.find(attrs=target_attrs_title)
 
     # NPR attributes
     if hostname == "www.npr.org":
@@ -94,6 +105,9 @@ def fetch_and_parse_article(url, hostname):
         dt = dt.astimezone(timezone.utc)
         article_date = dt.strftime("%B %d, %Y %I:%M %p %Z")
 
+        target_attrs_title = {"class": "storytitle"}
+        article_title = soup.find(attrs=target_attrs_title)
+
     # MSNBC attributes
     if hostname == "www.msnbc.com":
 
@@ -111,6 +125,9 @@ def fetch_and_parse_article(url, hostname):
         dt = datetime.strptime(article_date_og, "%Y-%m-%dT%H:%M:%S.%fZ")
         dt = dt.replace(tzinfo=timezone.utc)
         article_date = dt.strftime("%B %d, %Y %I:%M %p %Z")
+
+        target_attrs_title = {"class": "article-hero-headline__htag lh-none-print black-print"}
+        article_title = soup.find(attrs=target_attrs_title)
 
 
     # If nothing is found, treat URL as invalid for your purpose
@@ -131,7 +148,10 @@ def fetch_and_parse_article(url, hostname):
 
     date = article_date
 
-    return full_text, authors, date, publisher
+    title = article_title.get_text().replace('\n', '').replace('\t', '')
+    title = re.sub(r' {2,}', ' ', title)
+
+    return full_text, authors, date, publisher, title
 
 def check_url(url):
 
