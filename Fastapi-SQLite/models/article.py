@@ -16,12 +16,11 @@ class Article(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String, index=True)
-    source = Column(String, index=True)
-    url = Column(String, index=True)
-    date = Column(String, index=True)
-    leaning = Column(String, index=True)
-    content = Column(String)
     user_id = Column(Integer, index=True)
+    prediction = Column(String)
+    authors = Column(String)
+    date = Column(String)
+    publisher = Column(String)
 
 # Pydantic Models
 class ArticleRequest(BaseModel):
@@ -29,22 +28,20 @@ class ArticleRequest(BaseModel):
 
 class ArticleCreate(BaseModel):
     title: str
-    source: str
-    url: str
-    date: str
-    leaning: str
-    content: str
     user_id: int
+    prediction: str
+    authors: str
+    date: str
+    publisher: str
 
 class ArticleResponse(BaseModel):
     id: int
     title: str
-    source: str
-    url: str
-    date: str
-    leaning: str
-    content: str
     user_id: int
+    prediction: str
+    authors: str
+    date: str
+    publisher: str
 
     class Config:
         orm_mode = True
@@ -59,7 +56,8 @@ def analyze(request: ArticleRequest):
             "prediction": y_pred,
             "authors": authors,
             "date": date,
-            "publisher": publisher
+            "publisher": publisher,
+            "title": full_text[:100]  # Using first 100 chars of full text as title
         })
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -68,12 +66,11 @@ def analyze(request: ArticleRequest):
 def create_article(article: ArticleCreate, db: Session = Depends(get_db)):
     db_article = Article(
         title=article.title,
-        source=article.source,
-        url=article.url, 
+        user_id=article.user_id,
+        prediction=article.prediction,
+        authors=article.authors,
         date=article.date,
-        leaning=article.leaning,  # Fixed typo from 'learning' to 'leaning'
-        content=article.content,
-        user_id=article.user_id
+        publisher=article.publisher
     )
     db.add(db_article)
     db.commit()
@@ -98,7 +95,7 @@ def get_articles(
     return articles
 
 @article_router.delete("/{article_id}", response_model=ArticleResponse)
-def delete_article(article_id: int, db: Session = Depends(get_db)):  # Renamed from delete_user to delete_article
+def delete_article(article_id: int, db: Session = Depends(get_db)):
     article = db.query(Article).filter(Article.id == article_id).first()
     if not article:
         raise HTTPException(status_code=404, detail="Article not found")
