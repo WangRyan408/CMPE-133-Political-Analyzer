@@ -11,12 +11,29 @@ import { Label } from "@/components/ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ArticleAnalysis } from "@/components/article-analysis"
 
+type Analysis = {
+  "prediction": number,
+  "authors": string[],
+  "date": string
+  "publisher": string
+}
+
+
 export default function Home() {
   const [url, setUrl] = useState("")
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [showResults, setShowResults] = useState(false)
+  const [analysisData, setAnalysisData] = useState<Analysis>({
+    prediction: 0,
+    authors: [],
+    date: "",
+    publisher: ""
+  });
 
-  const handleAnalyze = () => {
+  const urlRegex = /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/;
+
+
+  const handleAnalyze = async () => {
     if (!url) {
       toast.error("Error", {
         description: "Please enter a URL to analyze",
@@ -24,13 +41,45 @@ export default function Home() {
       return
     }
 
+    if (!urlRegex.test(url)) {
+      toast.error("Error", {
+        description: "Invalid URL",
+      })
+      return
+    }
+
     setIsAnalyzing(true)
+    try {
+      const response = await fetch("/api/analysis", {
+        method: 'POST',
+        headers: {
+          'accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          url: url
+        })
+      });
+  
+      const responseData = await response.json();
+      setAnalysisData(responseData);
+
+      // Call create article endpoint here.
+
+     
+      setShowResults(true);
+      setIsAnalyzing(false);
+    } catch (error) {
+      console.log("Error Analyzing Article:", error);
+      setIsAnalyzing(false);
+    }
+    
 
     // Simulate analysis
-    setTimeout(() => {
-      setIsAnalyzing(false)
-      setShowResults(true)
-    }, 2000)
+    // setTimeout(() => {
+    //   setIsAnalyzing(false)
+    //   setShowResults(true)
+    // }, 2000)
   }
 
   return (
@@ -62,9 +111,8 @@ export default function Home() {
       {showResults && (
         <div className="mt-8">
           <Tabs defaultValue="analysis">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="analysis">Analysis</TabsTrigger>
-              <TabsTrigger value="article">Article Content</TabsTrigger>
+            <TabsList className="w-full">
+              <TabsTrigger value="analysis" className="w-full">Analysis</TabsTrigger>
             </TabsList>
             <TabsContent value="analysis">
               <Card>
@@ -97,47 +145,7 @@ export default function Home() {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <ArticleAnalysis />
-                </CardContent>
-                <CardFooter className="flex flex-col items-start">
-                  <h3 className="font-semibold mb-2">Discussion</h3>
-                  <div className="w-full p-4 border rounded-md bg-muted/50">
-                    <p className="text-center text-muted-foreground">
-                      Disqus comments would be embedded here for registered users
-                    </p>
-                  </div>
-                </CardFooter>
-              </Card>
-            </TabsContent>
-            <TabsContent value="article">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Article Content</CardTitle>
-                  <CardDescription>Content with politically charged words highlighted</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="prose max-w-none">
-                    <h2>Sample Article Title</h2>
-                    <p>
-                      This is a sample article content. Words like{" "}
-                      <span className="bg-red-100 px-1 rounded">controversial</span> and{" "}
-                      <span className="bg-blue-100 px-1 rounded">progressive</span> would be highlighted based on their
-                      political leaning. The system analyzes the{" "}
-                      <span className="bg-red-100 px-1 rounded">conservative</span> or{" "}
-                      <span className="bg-blue-100 px-1 rounded">liberal</span> nature of the content.
-                    </p>
-                    <p>
-                      Further paragraphs would contain more{" "}
-                      <span className="bg-blue-100 px-1 rounded">left-leaning</span> or{" "}
-                      <span className="bg-red-100 px-1 rounded">right-leaning</span> terminology that would be
-                      highlighted accordingly. The intensity of the highlighting might vary based on how strongly the
-                      word is associated with a particular political stance.
-                    </p>
-                    <p>
-                      The full article would be displayed here with all politically charged words highlighted for easy
-                      identification of potential bias in the reporting.
-                    </p>
-                  </div>
+                  <ArticleAnalysis data={analysisData}/>
                 </CardContent>
               </Card>
             </TabsContent>

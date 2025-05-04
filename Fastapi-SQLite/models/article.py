@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from typing import List
 from .database import Base, get_db
 from pydantic import BaseModel
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, Float
 from app.ffnn_model import NeuralNetworkModel
 from fastapi.responses import JSONResponse
 
@@ -16,12 +16,12 @@ class Article(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String, index=True)
-    source = Column(String, index=True)
-    url = Column(String, index=True)
-    date = Column(String, index=True)
-    leaning = Column(String, index=True)
-    content = Column(String)
     user_id = Column(Integer, index=True)
+    prediction = Column(Float)
+    authors = Column(String)
+    date = Column(String)
+    publisher = Column(String)
+    url = Column(String)  # Added URL field
 
 # Pydantic Models
 class ArticleRequest(BaseModel):
@@ -29,22 +29,22 @@ class ArticleRequest(BaseModel):
 
 class ArticleCreate(BaseModel):
     title: str
-    source: str
-    url: str
-    date: str
-    leaning: str
-    content: str
     user_id: int
+    prediction: float
+    authors: str
+    date: str
+    publisher: str
+    url: str  # Added URL field
 
 class ArticleResponse(BaseModel):
     id: int
     title: str
-    source: str
-    url: str
-    date: str
-    leaning: str
-    content: str
     user_id: int
+    prediction: float
+    authors: str
+    date: str
+    publisher: str
+    url: str  # Added URL field
 
     class Config:
         orm_mode = True
@@ -60,7 +60,8 @@ def analyze(request: ArticleRequest):
             "authors": authors,
             "date": date,
             "publisher": publisher,
-            "title": title
+            "title": title,
+            "url": request.url  # Include URL in response
         })
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -69,12 +70,12 @@ def analyze(request: ArticleRequest):
 def create_article(article: ArticleCreate, db: Session = Depends(get_db)):
     db_article = Article(
         title=article.title,
-        source=article.source,
-        url=article.url, 
+        user_id=article.user_id,
+        prediction=article.prediction,
+        authors=article.authors,
         date=article.date,
-        leaning=article.leaning,  # Fixed typo from 'learning' to 'leaning'
-        content=article.content,
-        user_id=article.user_id
+        publisher=article.publisher,
+        url=article.url  # Added URL field
     )
     db.add(db_article)
     db.commit()
@@ -85,21 +86,19 @@ def create_article(article: ArticleCreate, db: Session = Depends(get_db)):
 def get_articles(
     skip: int = 0,
     limit: int = 10,
-    user_id: int | None = None,  # Optional filter by user_id
+    user_id: int | None = None,
     db: Session = Depends(get_db)
 ):
     query = db.query(Article)
     
-    # Apply user_id filter if provided
     if user_id is not None:
         query = query.filter(Article.user_id == user_id)
     
-    # Apply pagination
     articles = query.offset(skip).limit(limit).all()
     return articles
 
 @article_router.delete("/{article_id}", response_model=ArticleResponse)
-def delete_article(article_id: int, db: Session = Depends(get_db)):  # Renamed from delete_user to delete_article
+def delete_article(article_id: int, db: Session = Depends(get_db)):
     article = db.query(Article).filter(Article.id == article_id).first()
     if not article:
         raise HTTPException(status_code=404, detail="Article not found")
