@@ -102,7 +102,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
       
       const responseData = await response.json();
+      console.log("Registration API response:", responseData);
+      console.log("isAdmin value in response:", responseData.isAdmin);
+      console.log("Type of isAdmin:", typeof responseData.isAdmin);
       console.log(responseData);
+
+      if (responseData && responseData.id) {
+        const userData = {
+          id: responseData.id,
+          name: responseData.name,
+          email: responseData.email,
+          role: responseData.isAdmin
+        };
+
+        setUser(userData);
+        localStorage.setItem("user", JSON.stringify(userData));
+      }
       setIsLoading(false);
       return true;
     } catch (error) {
