@@ -22,11 +22,12 @@ type User = {
 type Article = {
   id: number,
   title: string,
-  source: string,
+  prediction: number,
+  authors: string,
   url: string,
   date: string,
-  // leaning: "Far-Left" | "Left" | "Moderate" | "Right" | "Far-Right"
-  leaning: string
+  publisher: string,
+  user_id: number
 }
 
 
@@ -39,30 +40,30 @@ export default function SavedArticlesPage() {
 
   // Mock data for saved articles
   const [savedArticles, setSavedArticles] = useState<Article[]>([
-    {
-      id: 1,
-      title: "The Impact of New Tax Legislation",
-      source: "Example News",
-      url: "https://example.com/tax-legislation",
-      date: "April 5, 2025",
-      leaning: "Right",
-    },
-    {
-      id: 2,
-      title: "Climate Change Policy Developments",
-      source: "News Example",
-      url: "https://example.com/climate-policy",
-      date: "April 3, 2025",
-      leaning: "Left",
-    },
-    {
-      id: 3,
-      title: "Healthcare Reform Debate Continues",
-      source: "Daily News",
-      url: "https://example.com/healthcare-reform",
-      date: "April 1, 2025",
-      leaning: "Moderate",
-    },
+    // {
+    //   id: 1,
+    //   title: "The Impact of New Tax Legislation",
+    //   source: "Example News",
+    //   url: "https://example.com/tax-legislation",
+    //   date: "April 5, 2025",
+    //   leaning: "Right",
+    // },
+    // {
+    //   id: 2,
+    //   title: "Climate Change Policy Developments",
+    //   source: "News Example",
+    //   url: "https://example.com/climate-policy",
+    //   date: "April 3, 2025",
+    //   leaning: "Left",
+    // },
+    // {
+    //   id: 3,
+    //   title: "Healthcare Reform Debate Continues",
+    //   source: "Daily News",
+    //   url: "https://example.com/healthcare-reform",
+    //   date: "April 1, 2025",
+    //   leaning: "Moderate",
+    // },
   ])
 
 
@@ -76,7 +77,7 @@ export default function SavedArticlesPage() {
         const response = await axios.get(`/api/saved/?skip=0&limit=${maxArticles}&user_id=${parsedUser.id}`);
         const data = response.data;
         console.log(data);
-        setSavedArticles(prevArticles => [...prevArticles, ...data]);
+        setSavedArticles([...data]);
       }
     } catch (error) {
       console.error("Error checking authentication:", error);
@@ -112,7 +113,7 @@ export default function SavedArticlesPage() {
   const filteredArticles = savedArticles.filter(
     (article) =>
       article.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      article.source.toLowerCase().includes(searchTerm.toLowerCase()),
+      article.publisher.toLowerCase().includes(searchTerm.toLowerCase()),
   )
 
   const totalPages = Math.ceil(filteredArticles.length / articlesPerPage)
@@ -170,10 +171,10 @@ export default function SavedArticlesPage() {
                         <div>
                           <CardTitle className="text-lg">{article.title}</CardTitle>
                           <CardDescription>
-                            {article.source} • {article.date}
+                            {article.publisher} • {article.date}
                           </CardDescription>
                         </div>
-                        <Badge className={getPoliticalLeaningColor(article.leaning)}>{article.leaning}</Badge>
+                        {/*<Badge className={getPoliticalLeaningColor(article.leaning)}>{article.leaning}</Badge> */}
                       </div>
                     </CardHeader>
                     <CardContent className="pb-2">

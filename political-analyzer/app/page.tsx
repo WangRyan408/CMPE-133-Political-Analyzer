@@ -10,12 +10,14 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ArticleAnalysis } from "@/components/article-analysis"
+import { useAuth } from "@/contexts/auth-context"
 
 type Analysis = {
   "prediction": number,
-  "authors": string[],
+  "authors": string,
   "date": string
-  "publisher": string
+  "publisher": string,
+  "title": string,
 }
 
 
@@ -25,12 +27,15 @@ export default function Home() {
   const [showResults, setShowResults] = useState(false)
   const [analysisData, setAnalysisData] = useState<Analysis>({
     prediction: 0,
-    authors: [],
+    authors: "",
     date: "",
-    publisher: ""
+    publisher: "",
+    title: "",
   });
 
   const urlRegex = /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/;
+  
+  const { user } = useAuth();
 
 
   const handleAnalyze = async () => {
@@ -64,23 +69,53 @@ export default function Home() {
       const responseData = await response.json();
       setAnalysisData(responseData);
 
-      // Call create article endpoint here.
-
-     
+      
       setShowResults(true);
       setIsAnalyzing(false);
     } catch (error) {
       console.log("Error Analyzing Article:", error);
       setIsAnalyzing(false);
     }
-    
-
-    // Simulate analysis
-    // setTimeout(() => {
-    //   setIsAnalyzing(false)
-    //   setShowResults(true)
-    // }, 2000)
   }
+
+  const saveArticle = async () => {
+
+    // "title": "string",
+    // "user_id": 0,
+    // "prediction": 0,
+    // "authors": "string",
+    // "date": "string",
+    // "publisher": "string",
+    // "url": "string"
+    const saveArticleData = {
+        title: analysisData.title,
+        user_id: user?.id,
+        prediction: analysisData.prediction,
+        authors: analysisData.authors,
+        date: analysisData.date,
+        publisher: analysisData.publisher,
+        url: url
+    }
+    
+    console.log(saveArticleData);
+    const createArticle = await fetch("/api/create", {
+      method: 'POST',
+      headers: {
+        'accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(saveArticleData)
+    });
+
+    const articleResponse = await createArticle.json();
+    console.log(articleResponse);
+
+    toast.success("Article saved", {
+      description: "The article has been saved to your account",
+    })
+
+  }
+
 
   return (
     <div className="container py-8 px-4 md:py-12">
@@ -126,11 +161,7 @@ export default function Home() {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => {
-                          toast.success("Article saved", {
-                            description: "The article has been saved to your account",
-                          })
-                        }}
+                        onClick={saveArticle}
                       >
                         <BookmarkPlus className="h-4 w-4 mr-2" />
                         Save Article
