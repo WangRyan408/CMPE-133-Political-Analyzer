@@ -144,6 +144,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  const saveArticle = async (pred: number, authors: string, date: string, publisher: string) => {
+
+  }
+
   return (
     <AuthContext.Provider value={{ user, isLoading, login, register, logout, isAdmin, updateUser }}>
       {children}

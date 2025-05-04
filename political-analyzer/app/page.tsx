@@ -48,6 +48,7 @@ export default function Home() {
       return
     }
 
+<<<<<<< HEAD
     setIsAnalyzing(true)
     try {
       const response = await fetch("/api/analysis", {
@@ -75,6 +76,8 @@ export default function Home() {
     }
     
 
+=======
+>>>>>>> 46e334422aeecc81479ba94ce21bb9040cb21a15
     // Simulate analysis
     // setTimeout(() => {
     //   setIsAnalyzing(false)

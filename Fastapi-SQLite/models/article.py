@@ -54,12 +54,13 @@ class ArticleResponse(BaseModel):
 def analyze(request: ArticleRequest):
     try:
         model = NeuralNetworkModel()
-        y_pred, authors, date, publisher, full_text = model.test(request.url)
+        y_pred, authors, date, publisher, full_text, title = model.test(request.url)
         return JSONResponse(content={
             "prediction": y_pred,
             "authors": authors,
             "date": date,
-            "publisher": publisher
+            "publisher": publisher,
+            "title": title
         })
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
