@@ -4,7 +4,7 @@ import os
 import time
 from joblib import dump, load
 
-from scraper import fetch_and_parse_article, check_url
+from app.scraper import fetch_and_parse_article, check_url
 
 # For prebuilt neural network
 from sklearn.neural_network import MLPRegressor
@@ -21,8 +21,8 @@ class NeuralNetworkModel():
 
         print("Starting training\n")
 
-        features_csv="Fastapi-SQLite/binaries/embeddings_2.csv"
-        outputs_csv="Fastapi-SQLite/binaries/outputs_training.csv"
+        features_csv="binaries/embeddings_2.csv"
+        outputs_csv="binaries/outputs_training.csv"
 
         rel_path_em = os.path.relpath(features_csv)
         em_df = pd.read_csv(rel_path_em)
@@ -39,7 +39,7 @@ class NeuralNetworkModel():
         elapsed_time = end_time - start_time
         print("\nNeural Network Execution Time: ", elapsed_time, "\n")
 
-        dump(regressor, 'Fastapi-SQLite/binaries/mlp_model.joblib')
+        dump(regressor, 'binaries/mlp_model.joblib')
 
     def test(self, url):
         full_text = "" 
@@ -60,7 +60,7 @@ class NeuralNetworkModel():
 
         test_data = test_data.reshape(1, 1024)
 
-        regressor = load('Fastapi-SQLite/binaries/mlp_model.joblib')
+        regressor = load('binaries/mlp_model.joblib')
 
         y_pred = regressor.predict(test_data)
 
@@ -73,7 +73,11 @@ class NeuralNetworkModel():
         print("\nDate:", date)
         print("Publisher:", publisher)
 
+        return float(y_pred), authors, date, publisher, full_text
+
 # ---- Start of main ---- #
+
+print(os.getcwd())
 
 model = NeuralNetworkModel()
 # model.train()

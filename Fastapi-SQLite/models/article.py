@@ -4,6 +4,8 @@ from typing import List
 from .database import Base, get_db
 from pydantic import BaseModel
 from sqlalchemy import Column, Integer, String
+from app.ffnn_model import NeuralNetworkModel
+from fastapi.responses import JSONResponse
 
 # Create the router
 article_router = APIRouter()
@@ -22,6 +24,9 @@ class Article(Base):
     user_id = Column(Integer, index=True)
 
 # Pydantic Models
+class ArticleRequest(BaseModel):
+    url: str
+
 class ArticleCreate(BaseModel):
     title: str
     source: str
@@ -45,6 +50,20 @@ class ArticleResponse(BaseModel):
         orm_mode = True
 
 # Endpoints
+@article_router.post("/analyze")
+def analyze(request: ArticleRequest):
+    try:
+        model = NeuralNetworkModel()
+        y_pred, authors, date, publisher, full_text = model.test(request.url)
+        return JSONResponse(content={
+            "prediction": y_pred,
+            "authors": authors,
+            "date": date,
+            "publisher": publisher
+        })
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 @article_router.post("/create", response_model=ArticleResponse)
 def create_article(article: ArticleCreate, db: Session = Depends(get_db)):
     db_article = Article(
