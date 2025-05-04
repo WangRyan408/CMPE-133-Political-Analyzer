@@ -29,7 +29,7 @@ class ArticleRequest(BaseModel):
 class ArticleCreate(BaseModel):
     title: str
     user_id: int
-    prediction: str
+    prediction: float
     authors: str
     date: str
     publisher: str
@@ -38,7 +38,7 @@ class ArticleResponse(BaseModel):
     id: int
     title: str
     user_id: int
-    prediction: str
+    prediction: float
     authors: str
     date: str
     publisher: str
