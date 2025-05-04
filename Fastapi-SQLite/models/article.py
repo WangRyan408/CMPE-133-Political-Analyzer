@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from typing import List
 from .database import Base, get_db
 from pydantic import BaseModel
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, Float
 from app.ffnn_model import NeuralNetworkModel
 from fastapi.responses import JSONResponse
 
@@ -17,10 +17,11 @@ class Article(Base):
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String, index=True)
     user_id = Column(Integer, index=True)
-    prediction = Column(String)
+    prediction = Column(Float)
     authors = Column(String)
     date = Column(String)
     publisher = Column(String)
+    url = Column(String)  # Added URL field
 
 # Pydantic Models
 class ArticleRequest(BaseModel):
@@ -33,6 +34,7 @@ class ArticleCreate(BaseModel):
     authors: str
     date: str
     publisher: str
+    url: str  # Added URL field
 
 class ArticleResponse(BaseModel):
     id: int
@@ -42,6 +44,7 @@ class ArticleResponse(BaseModel):
     authors: str
     date: str
     publisher: str
+    url: str  # Added URL field
 
     class Config:
         orm_mode = True
@@ -56,7 +59,9 @@ def analyze(request: ArticleRequest):
             "prediction": y_pred,
             "authors": authors,
             "date": date,
-            "publisher": publisher
+            "publisher": publisher,
+            "title": title,
+            "url": request.url  # Include URL in response
         })
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -69,7 +74,8 @@ def create_article(article: ArticleCreate, db: Session = Depends(get_db)):
         prediction=article.prediction,
         authors=article.authors,
         date=article.date,
-        publisher=article.publisher
+        publisher=article.publisher,
+        url=article.url  # Added URL field
     )
     db.add(db_article)
     db.commit()
@@ -80,16 +86,14 @@ def create_article(article: ArticleCreate, db: Session = Depends(get_db)):
 def get_articles(
     skip: int = 0,
     limit: int = 10,
-    user_id: int | None = None,  # Optional filter by user_id
+    user_id: int | None = None,
     db: Session = Depends(get_db)
 ):
     query = db.query(Article)
     
-    # Apply user_id filter if provided
     if user_id is not None:
         query = query.filter(Article.user_id == user_id)
     
-    # Apply pagination
     articles = query.offset(skip).limit(limit).all()
     return articles
 
