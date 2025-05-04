@@ -28,7 +28,7 @@ export async function PUT(request: NextRequest) {
       const data = await response.json();
       return NextResponse.json(data);
     } catch (error) {
-      console.error("Update failed:", error);
+      console.error("Proxy Error:", error);
       return NextResponse.json({ error: "Update failed" }, { status: 500 });
     }
   }
