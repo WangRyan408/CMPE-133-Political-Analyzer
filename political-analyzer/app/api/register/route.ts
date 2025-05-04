@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
         name: data.name,
         email: data.email,
         password: data.password,
-        secret_key: data.secretKey
+        secret_key: data.secret_key
       })
     });
     
