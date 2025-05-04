@@ -6,7 +6,7 @@ from datetime import datetime, timezone
 import re
 
 # Global variables
-accepted_dns = [ # "apnews.com",
+accepted_dns = [ 
     "www.cnn.com", "www.foxnews.com", "www.foxbusiness.com", "www.bbc.com",
     "www.npr.org", "www.msnbc.com"
 ]

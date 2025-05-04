@@ -26,8 +26,6 @@ export default function Home() {
 
     setIsAnalyzing(true)
 
-    // ENTER ANALYSIS STUFF HERE
-
     // Simulate analysis
     setTimeout(() => {
       setIsAnalyzing(false)
