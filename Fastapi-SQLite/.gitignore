@@ -1,1 +1,16 @@
+# Python
 __pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual environment
+venv/
+
+# SQLite database
+*.db
+
+# Model files (if they are large or generated)
+binaries/
+
+# VSCode settings (optional, for personal/editor settings)
+.vscode/
