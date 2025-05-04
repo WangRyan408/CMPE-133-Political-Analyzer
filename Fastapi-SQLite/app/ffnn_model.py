@@ -60,7 +60,7 @@ class NeuralNetworkModel():
 
         test_data = test_data.reshape(1, 1024)
 
-        regressor = load('Fastapi-SQLite/binaries/mlp_model.joblib')
+        regressor = load('../binaries/mlp_model.joblib')
 
         y_pred = regressor.predict(test_data)
 
@@ -77,6 +77,7 @@ class NeuralNetworkModel():
 
 model = NeuralNetworkModel()
 # model.train()
+#print(os.getcwd())
 model.test("https://www.cnn.com/2025/03/11/politics/department-of-education-cuts/index.html")
 
 # MSNBC https://www.msnbc.com/opinion/msnbc-opinion/first-100-days-wall-street-trump-newsletter-rcna203413
