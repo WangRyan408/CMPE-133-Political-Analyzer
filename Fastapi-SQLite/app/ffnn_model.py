@@ -21,8 +21,8 @@ class NeuralNetworkModel():
 
         print("Starting training\n")
 
-        features_csv="datasets/embeddings_2.csv"
-        outputs_csv="datasets/outputs_training.csv"
+        features_csv="Fastapi-SQLite/binaries/embeddings_2.csv"
+        outputs_csv="Fastapi-SQLite/binaries/outputs_training.csv"
 
         rel_path_em = os.path.relpath(features_csv)
         em_df = pd.read_csv(rel_path_em)
@@ -39,7 +39,7 @@ class NeuralNetworkModel():
         elapsed_time = end_time - start_time
         print("\nNeural Network Execution Time: ", elapsed_time, "\n")
 
-        dump(regressor, 'nn_model/mlp_model.joblib')
+        dump(regressor, 'Fastapi-SQLite/binaries/mlp_model.joblib')
 
     def test(self, url):
         full_text = "" 
@@ -60,7 +60,7 @@ class NeuralNetworkModel():
 
         test_data = test_data.reshape(1, 1024)
 
-        regressor = load('nn_model/mlp_model.joblib')
+        regressor = load('Fastapi-SQLite/binaries/mlp_model.joblib')
 
         y_pred = regressor.predict(test_data)
 
