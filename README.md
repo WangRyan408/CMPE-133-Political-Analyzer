@@ -7,7 +7,7 @@ Our project is intended to help people more easily understand the angle of their
 
 ## Quickstart 
 ### Fastapi-SQLite
-While in the Fastapi-SQLite directory in a terminal window, run "pip install -r requirements.txt" to install the python libraries. Then, run "uvicorn main:app --reload" to run the backend.
+While in the Fastapi-SQLite directory in a terminal window, create a binaries folder and store the mlp_model.joblib file in it. Then, run "pip install -r requirements.txt" to install the python libraries. Then, run "uvicorn main:app --reload" to run the backend.
 
 ### political-analyzer
 Make sure to have Node.js and npm installed. While in the political-analyzer in a terminal window, run "npm install --force" and then run "npm run dev" to run the frontend.

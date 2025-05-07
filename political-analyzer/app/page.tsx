@@ -67,6 +67,7 @@ export default function Home() {
       });
   
       const responseData = await response.json();
+      console.log(responseData);
       setAnalysisData(responseData);
 
       

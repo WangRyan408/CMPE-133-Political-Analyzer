@@ -1,12 +1,17 @@
 import os
 from dotenv import load_dotenv
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Response
 from sqlalchemy.orm import Session
 from sqlalchemy import and_
 from typing import List, Optional
 from .database import Base, get_db
 from pydantic import BaseModel
 from sqlalchemy import Column, Integer, String
+from fastapi.responses import JSONResponse, FileResponse
+import json
+from datetime import datetime
+import tempfile
+
 
 load_dotenv()
 SECRET_KEY = os.getenv("ADMIN_SECRET_KEY")
@@ -80,14 +85,49 @@ def update_user(user_id: int, user: UserUpdate, db: Session = Depends(get_db)):
     db.refresh(db_user)
     return db_user
 
-@account_router.delete("/{user_id}", response_model=UserResponse)
-def delete_user(user_id: int, db: Session = Depends(get_db)):
+@account_router.delete("/delete/{user_id}", response_model=UserResponse)
+def delete_user_account(user_id: int, db: Session = Depends(get_db)):
+    """
+    Endpoint to delete a specific user account by ID.
+    Returns the deleted user information.
+    """
     db_user = db.query(User).filter(User.id == user_id).first()
     if not db_user:
         raise HTTPException(status_code=404, detail="User not found")
     db.delete(db_user)
     db.commit()
     return db_user
+
+@account_router.get("/download/{user_id}", response_class=Response)
+def download_user_info(user_id: int, db: Session = Depends(get_db)):
+    """
+    Endpoint to download a user's information as a JSON file.
+    Returns a JSON file containing the user's information.
+    """
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Convert user data to dictionary
+    user_data = {
+        "id": user.id,
+        "name": user.name,
+        "email": user.email,
+        "isAdmin": bool(user.isAdmin)
+    }
+    
+    # Convert to JSON string
+    json_data = json.dumps(user_data, indent=2)
+    
+    # Create response with JSON file
+    return Response(
+        content=json_data,
+        media_type="application/json",
+        headers={
+            "Content-Disposition": f"attachment; filename=user_{user_id}_info.json",
+            "Access-Control-Expose-Headers": "Content-Disposition"
+        }
+    )
 
 @account_router.get("/view", response_model=List[UserResponse])
 def view_accounts(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
