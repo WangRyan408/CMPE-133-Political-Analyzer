@@ -81,9 +81,9 @@ class NeuralNetworkModel():
 
 print(os.getcwd())
 
-#model = NeuralNetworkModel()
+# model = NeuralNetworkModel()
 # model.train()
-#model.test("https://www.msnbc.com/opinion/msnbc-opinion/first-100-days-wall-street-trump-newsletter-rcna203413")
+# model.test("https://www.foxnews.com/politics/blue-state-governor-another-appearance-trump-before-100-day-speech-happy-here")
 
 # MSNBC https://www.msnbc.com/opinion/msnbc-opinion/first-100-days-wall-street-trump-newsletter-rcna203413
 # New York Post https://nypost.com/2025/04/29/lifestyle/why-just-checking-in-emails-are-a-bad-idea-experts-say/
