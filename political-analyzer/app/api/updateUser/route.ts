@@ -32,3 +32,27 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: "Update failed" }, { status: 500 });
     }
   }
+
+  export async function DELETE(request: NextRequest) {
+    const params = request.nextUrl.searchParams;
+    const id = params.get("user_id");
+
+    try {
+      const response = await fetch(`http://localhost:8000/users/delete/${id}`, {
+        method: 'DELETE', // Specify the HTTP method
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
+      }
+
+      const data = response.json();
+      return NextResponse.json(data);
+    } catch (error) {
+      return NextResponse.json({ error: "Account deletion failed" }, { status: 500 });
+    }
+
+  }

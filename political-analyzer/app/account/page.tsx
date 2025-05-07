@@ -27,7 +27,7 @@ export default function AccountPage() {
   const [confirmPassword, setConfirmPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
 
-  const { user, updateUser } = useAuth();
+  const { user, updateUser, logout } = useAuth();
 
 
   const handleUpdateProfile = async (e: React.FormEvent) => {
@@ -99,11 +99,58 @@ export default function AccountPage() {
   }
 
   //TODO: Allow user to download db data into CSV
-  const handleDownloadData = () => {
-    toast.success("Data export initiated", {
-      description: "Your data will be emailed to you shortly",
-    })
+  const handleDownloadData = async () => {
+
+    try {
+      const response = await axios.get(`/api/download/?user_id=${user?.id}`,
+        {
+          responseType: 'blob'
+        }
+      );
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', `user_${user?.id}_info.json`);
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+      toast.success("Data export initiated", {
+        description: "Your data has successfully downloaded",
+      })
+
+    } catch (error) {
+      console.error("Password Update Failed:", error);
+      toast.error("Data Export failed", {
+        description: "There was a problem downloading your data",
+      });
+    }
   }
+
+
+  // Delete Account
+  // Remove from localStorage
+  // Redirect to Home
+  const handleAccountDeletion = async () => {
+    try {
+      if (confirm("Are you sure you want to delete your account? This action cannot be undone.")) {
+        const response = await axios.delete(`/api/updateUser/?user_id=${user?.id}`);  //Delete from DB
+        console.log(response.data);
+        logout();
+        toast.success("Account deleted", {
+          description: "Your account has been permanently deleted",
+        })
+      }
+    } catch (error) {
+      console.error("Acoount Deletion Failed:", error);
+      toast.error("Account Deletion failed", {
+        description: "There was a problem deleting your account",
+      });
+    }
+  }
+
+
+
+
 
   return (
     <AuthRouteGuard>
@@ -232,13 +279,7 @@ export default function AccountPage() {
                     </Alert>
                     <Button
                       variant="destructive"
-                      onClick={() => {
-                        if (confirm("Are you sure you want to delete your account? This action cannot be undone.")) {
-                          toast.success("Account deleted", {
-                            description: "Your account has been permanently deleted",
-                          })
-                        }
-                      }}
+                      onClick={handleAccountDeletion}
                     >
                       <Trash2 className="h-4 w-4 mr-2" />
                       Delete Account

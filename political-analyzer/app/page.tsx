@@ -147,7 +147,7 @@ export default function Home() {
             </Button>
           </div>
           <p className="text-sm text-muted-foreground">
-            Supported sites: CNN, Fox News, New York Times, Washington Post, BBC, etc.
+            Supported sites: CNN, Fox News, NPR, MSNBC, BBC, etc.
           </p>
         </div>
       </div>

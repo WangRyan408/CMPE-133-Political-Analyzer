@@ -33,7 +33,7 @@ export function ArticleAnalysis({ data }: ArticleAnalysisProps) {
   // Calculate position for the indicator (0-100%)
   const getIndicatorPosition = (prediction: number) => {
     // Convert from 0-1 scale to 0-100% scale
-    return (1 - prediction) * 100;
+    return Math.abs((1 - prediction)) * 100;
   }
   
   // Calculate percentage leaning (with center at 0%)
@@ -91,7 +91,6 @@ export function ArticleAnalysis({ data }: ArticleAnalysisProps) {
         <div className="text-sm text-muted-foreground">
           Distribution of political leaning across analyzed articles
         </div>
-        1
         <div className="grid grid-cols-5 text-sm mt-4">
           <div>Far Left<br/>100%</div>
           <div>Left<br/>50%</div>
