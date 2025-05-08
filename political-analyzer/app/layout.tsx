@@ -46,7 +46,7 @@ export default function RootLayout({
                 </div>
               </footer>
             </div>
-            <Toaster />
+            {/**<Toaster /> */}
           </AuthProvider>
         </ThemeProvider>
       </body>
