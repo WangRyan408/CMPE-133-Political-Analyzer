@@ -77,9 +77,7 @@ export function ArticleAnalysis({ data }: ArticleAnalysisProps) {
   }
 
   // Helper function for term badge color
-  const getTermBadgeColor = (leaning: string) => {
-    return leaning === "left" ? "bg-blue-100 text-blue-800" : "bg-red-100 text-red-800"
-  }
+
 
   return (
     <div className="space-y-6">

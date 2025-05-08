@@ -10,12 +10,12 @@ import { Input } from "@/components/ui/input"
 import { AuthRouteGuard } from "@/components/auth-route-guard"
 import axios from 'axios';
 
-type User = {
-  id: string
-  name: string
-  email: string
-  role: boolean
-}
+// type User = {
+//   id: string
+//   name: string
+//   email: string
+//   role: boolean
+// }
 
 type Article = {
   id: number,
@@ -32,7 +32,6 @@ type Article = {
 export default function SavedArticlesPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [user, setUser] = useState<User | null>(null);
   const articlesPerPage = 10;
   const maxArticles = 25;
 
@@ -70,8 +69,6 @@ export default function SavedArticlesPage() {
       const storedUser = localStorage.getItem("user");
       if (storedUser) {
         const parsedUser = JSON.parse(storedUser);
-        setUser(parsedUser);
-        
         const response = await axios.get(`/api/saved/?skip=0&limit=${maxArticles}&user_id=${parsedUser.id}`);
         const data = response.data;
         console.log(data);
@@ -96,6 +93,7 @@ export default function SavedArticlesPage() {
         description: "The article has been removed from your saved list",
       });
     } catch (error) {
+      console.error("Error removing article:", error);
       toast.error("Failed to remove article", {
         description: "Please try again later",
       });
