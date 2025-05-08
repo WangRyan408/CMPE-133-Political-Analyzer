@@ -28,7 +28,7 @@ source venv/bin/activate
 3. Use the provided makefile (assuming you have make installed) to spin up the dev server
 ```
 make dev
-//Otherwise use the following command
+//  Otherwise use the following command
 uvicorn main:app --reload
 ```
 4. Test endpoints with cURL/Tool of your choosing(e.g. Postman/Insomnia) OR just integrate to frontend.
