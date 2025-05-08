@@ -11,6 +11,7 @@ export async function GET(request: NextRequest) {
     const data = await response.json();
     return NextResponse.json(data);
   } catch (error) {
+    console.log("Error fetching saved articles:", error);
     return NextResponse.json({ error: "Login failed" }, { status: 500 });
   }
 }
@@ -35,6 +36,7 @@ export async function DELETE(request: NextRequest) {
     const data = await response.json();
     return NextResponse.json(data);
   } catch (error) {
+    console.log("Error deleting article:", error);
     return NextResponse.json({ error: "Delete failed" }, { status: 500 });
   }
 }

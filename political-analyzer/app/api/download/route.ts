@@ -20,6 +20,7 @@ export async function GET(request: NextRequest) {
             }
         });
     } catch (error) {
+        console.log("Error downloading user data:", error);
         return NextResponse.json({ error: "Download failed" }, { status: 500 });
     }
 }

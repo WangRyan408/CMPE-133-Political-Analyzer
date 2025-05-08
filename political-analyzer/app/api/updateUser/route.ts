@@ -52,6 +52,7 @@ export async function PUT(request: NextRequest) {
       const data = response.json();
       return NextResponse.json(data);
     } catch (error) {
+      console.log("Error deleting user:", error);
       return NextResponse.json({ error: "Account deletion failed" }, { status: 500 });
     }
 
