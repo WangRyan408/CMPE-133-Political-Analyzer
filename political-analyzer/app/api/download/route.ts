@@ -4,9 +4,9 @@ import { NextRequest, NextResponse } from "next/server";
 export async function GET(request: NextRequest) {
     const params = request.nextUrl.searchParams;
     const id = params.get("user_id");
-    
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL;
     try {
-        const response = await fetch(`http://localhost:8000/users/download/${id}`);
+        const response = await fetch(`${apiUrl}/users/download/${id}`);
 
         if (!response.ok) {
             return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });

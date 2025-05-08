@@ -5,9 +5,9 @@ export async function GET(request: NextRequest) {
   const skip = searchParams.get('skip');
   const limit = searchParams.get('limit');
   const userId = searchParams.get('user_id');
-
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
   try {
-    const response = await fetch(`http://localhost:8000/articles/?skip=${skip}&limit=${limit}&user_id=${userId}`);
+    const response = await fetch(`${apiUrl}/articles/?skip=${skip}&limit=${limit}&user_id=${userId}`);
     const data = await response.json();
     return NextResponse.json(data);
   } catch (error) {
@@ -19,13 +19,14 @@ export async function GET(request: NextRequest) {
 export async function DELETE(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const articleId = searchParams.get('id');
-  
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+
   if (!articleId) {
     return NextResponse.json({ error: "Article ID is required" }, { status: 400 });
   }
   
   try {
-    const response = await fetch(`http://localhost:8000/articles/${articleId}`, {
+    const response = await fetch(`${apiUrl}/articles/${articleId}`, {
       method: 'DELETE',
     });
     

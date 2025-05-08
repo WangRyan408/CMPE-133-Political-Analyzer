@@ -2,10 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 
 
 export async function POST(request: NextRequest) {
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
     try {
       const data = await request.json();
       
-      const response = await fetch("http://localhost:8000/articles/create", {
+      const response = await fetch(`${apiUrl}/articles/create`, {
         method: 'POST',
         headers: {
           'accept': 'application/json',

@@ -10,7 +10,7 @@ app = FastAPI()
 
 app.add_middleware(
        CORSMiddleware,
-       allow_origins=["http://localhost:3000"],  # In production, set to your frontend URL
+       allow_origins=["http://localhost:3000", "https://cmpe-133-political-analyzer-zw55.vercel.app/"],  # In production, set to your frontend URL
        allow_credentials=True,
        allow_methods=["*"],
        allow_headers=["*"],

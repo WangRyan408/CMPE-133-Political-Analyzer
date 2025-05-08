@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 export async function PUT(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get('user_id');
-    
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL;
     if (!userId) {
       return NextResponse.json({ error: "User ID is required" }, { status: 400 });
     }
@@ -13,7 +13,7 @@ export async function PUT(request: NextRequest) {
       // Get request body data
       const requestData = await request.json();
       
-      const response = await fetch(`http://localhost:8000/users/update?user_id=${userId}`, {
+      const response = await fetch(`${apiUrl}/users/update?user_id=${userId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
@@ -36,9 +36,9 @@ export async function PUT(request: NextRequest) {
   export async function DELETE(request: NextRequest) {
     const params = request.nextUrl.searchParams;
     const id = params.get("user_id");
-
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL;
     try {
-      const response = await fetch(`http://localhost:8000/users/delete/${id}`, {
+      const response = await fetch(`${apiUrl}/users/delete/${id}`, {
         method: 'DELETE', // Specify the HTTP method
         headers: {
           'Content-Type': 'application/json'

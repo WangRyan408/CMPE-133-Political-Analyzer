@@ -3,8 +3,8 @@ import { NextRequest, NextResponse } from 'next/server';
 export async function POST(request: NextRequest) {
   try {
     const data = await request.json();
-    
-    const response = await fetch("http://localhost:8000/users/register", {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+    const response = await fetch(`${apiUrl}/users/register`, {
       method: 'POST',
       headers: {
         'accept': 'application/json',
